@@ -42,8 +42,15 @@ app.get('/api/protected', (req, res) => {
 
   if (!token) return res.status(403).json({ message: 'Token não fornecido' });
 
-  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
-    if (err) return res.status(403).json({ message: 'Token inválido' });
+  // Remover o prefixo "Bearer " caso esteja presente
+  const tokenWithoutBearer = token.startsWith('Bearer ') ? token.slice(7, token.length) : token;
+
+  jwt.verify(tokenWithoutBearer, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token inválido', error: err.message });
+    }
+
+    // Se o token for válido, você pode acessar os dados decodificados (como o nome de usuário)
     res.json({ message: 'Acesso permitido', user: decoded });
   });
 });

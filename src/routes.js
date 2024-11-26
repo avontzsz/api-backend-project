@@ -7,6 +7,7 @@ const routes = async (req, res) => {
     req.on('data', (chunk) => (body += chunk.toString()));
     req.on('end', () => register({ ...req, body: JSON.parse(body) }, res));
   } else if (req.url === '/login' && req.method === 'POST') {
+    console.log("/login")
     let body = '';
     req.on('data', (chunk) => (body += chunk.toString()));
     req.on('end', () => login({ ...req, body: JSON.parse(body) }, res));
