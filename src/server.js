@@ -2,7 +2,8 @@ const express = require('express');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { Client } = require('pg');
-const { register } = require('./controllers/UserController');  // Importar a função register
+const { register } = require('./controllers/UserController');  // Importando a função register
+const { deleteUserByEmail } = require('./repositories/UserRepository');  // Importando a função deleteUserByEmail
 
 // Carregar as variáveis de ambiente
 dotenv.config();
@@ -28,7 +29,6 @@ client.connect();
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
-  // Exemplo de verificação simples de credenciais
   if (username === 'admin' && password === 'admin') {
     const token = jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
     return res.json({ token });
@@ -37,8 +37,26 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// Endpoint de registro (POST) - Adicionado
-app.post('/register', register);  // Chama a função register ao acessar essa rota
+// Endpoint de registro (POST)
+app.post('/register', register);
+
+// Endpoint DELETE para excluir um usuário pelo email
+app.delete('/delete/:email', async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const userDeleted = await deleteUserByEmail(email);
+
+    if (!userDeleted) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    res.status(200).json({ message: 'Usuário deletado com sucesso' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro ao deletar o usuário' });
+  }
+});
 
 // Endpoint protegido (GET)
 app.get('/api/protected', (req, res) => {
@@ -46,7 +64,6 @@ app.get('/api/protected', (req, res) => {
 
   if (!token) return res.status(403).json({ message: 'Token não fornecido' });
 
-  // Remover o prefixo "Bearer " caso esteja presente
   const tokenWithoutBearer = token.startsWith('Bearer ') ? token.slice(7, token.length) : token;
 
   jwt.verify(tokenWithoutBearer, process.env.SECRET_KEY, (err, decoded) => {
@@ -54,7 +71,6 @@ app.get('/api/protected', (req, res) => {
       return res.status(403).json({ message: 'Token inválido', error: err.message });
     }
 
-    // Se o token for válido, você pode acessar os dados decodificados (como o nome de usuário)
     res.json({ message: 'Acesso permitido', user: decoded });
   });
 });
