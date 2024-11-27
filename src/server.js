@@ -1,7 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-const { Client } = require('pg');  // Biblioteca para interagir com o PostgreSQL
+const { Client } = require('pg');
+const { register } = require('./controllers/UserController');  // Importar a função register
 
 // Carregar as variáveis de ambiente
 dotenv.config();
@@ -23,7 +24,7 @@ const client = new Client({
 
 client.connect();
 
-// Endpoint de exemplo (POST)
+// Endpoint de login (POST)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
@@ -36,7 +37,10 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// Endpoint de exemplo (GET)
+// Endpoint de registro (POST) - Adicionado
+app.post('/register', register);  // Chama a função register ao acessar essa rota
+
+// Endpoint protegido (GET)
 app.get('/api/protected', (req, res) => {
   const token = req.headers['authorization'];
 
