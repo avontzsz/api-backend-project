@@ -1,22 +1,17 @@
 openapi: 3.0.0
 info:
   title: Organiza API
-  description: API para o app de finanças 'Organiza', com funcionalidades de autenticação e gerenciamento de usuários.
+  description: API para gerenciamento de usuários, autenticação e operações relacionadas.
   version: 1.0.0
-  contact:
-    name: Sua Equipe de Desenvolvimento
-    email: seuemail@exemplo.com
 servers:
-  - url: 'http://localhost:3000'
-    description: Servidor de Desenvolvimento
-
+  - url: http://localhost:3000
+    description: Servidor local
 paths:
   /register:
     post:
-      summary: Registra um novo usuário
-      operationId: registerUser
+      summary: Registro de usuário
       requestBody:
-        description: Informações de registro do usuário
+        required: true
         content:
           application/json:
             schema:
@@ -24,35 +19,20 @@ paths:
               properties:
                 email:
                   type: string
-                  format: email
-                  description: E-mail do usuário
+                  example: user@example.com
                 password:
                   type: string
-                  description: Senha do usuário
+                  example: senha123
       responses:
         '201':
           description: Usuário registrado com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  email:
-                    type: string
-                  id:
-                    type: integer
-                    description: ID do usuário registrado
         '400':
-          description: E-mail já registrado
-        '500':
-          description: Erro no servidor
-
+          description: Erro de validação ou usuário já registrado
   /login:
     post:
-      summary: Realiza o login e gera um token JWT
-      operationId: loginUser
+      summary: Login do usuário
       requestBody:
-        description: Informações de login do usuário
+        required: true
         content:
           application/json:
             schema:
@@ -60,14 +40,13 @@ paths:
               properties:
                 email:
                   type: string
-                  format: email
-                  description: E-mail do usuário
+                  example: user@example.com
                 password:
                   type: string
-                  description: Senha do usuário
+                  example: senha123
       responses:
         '200':
-          description: Login bem-sucedido, token gerado
+          description: Login bem-sucedido, retorna o token JWT
           content:
             application/json:
               schema:
@@ -75,74 +54,39 @@ paths:
                 properties:
                   token:
                     type: string
-                    description: Token JWT gerado
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI...
         '401':
           description: Credenciais inválidas
-        '500':
-          description: Erro no servidor
-
   /delete/{email}:
     delete:
-      summary: Exclui um usuário pelo e-mail
-      operationId: deleteUser
+      summary: Deletar usuário
       parameters:
         - name: email
           in: path
           required: true
-          description: E-mail do usuário a ser excluído
           schema:
             type: string
-            format: email
+          description: Email do usuário a ser deletado
       responses:
         '200':
           description: Usuário deletado com sucesso
         '404':
           description: Usuário não encontrado
         '500':
-          description: Erro ao deletar o usuário
-
+          description: Erro interno
   /api/protected:
     get:
-      summary: Endpoint protegido que exige autenticação
-      operationId: protectedEndpoint
+      summary: Endpoint protegido
       security:
-        - BearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Acesso permitido
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Acesso permitido'
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                      username:
-                        type: string
         '403':
-          description: Token não fornecido ou inválido
-
+          description: Token ausente ou inválido
 components:
   securitySchemes:
-    BearerAuth:
+    bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  schemas:
-    User:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-        id:
-          type: integer
