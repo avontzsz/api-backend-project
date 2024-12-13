@@ -2,9 +2,8 @@
 
 Este projeto foi desenvolvido por:
 
-1. **Arthur Miguel Dos Santos Sales**
-2. **Álvaro da Cunha Cavalcanti Pinto**
-3. **Jordão Victor Emery Oliveira Cavalcanti**
-
----
+1. **Arthur Miguel Dos Santos Sales**  
+2. **Álvaro da Cunha Cavalcanti Pinto**  
+3. **Jordão Victor Emery Oliveira Cavalcanti**  
+4. **Ítalo Waldecy Pereira Dos**  
 
